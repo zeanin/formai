@@ -1,203 +1,61 @@
 # Formai
 
-**AI-Native No-Code Application Platform**
+> **AI-Native, Schema-Driven No-Code Application Platform**
 
-Formai is a next-generation, AI-driven enterprise application builder that enables teams to create full-stack applications through natural language and visual design — without writing code.
+Formai is a next-generation platform for building full-stack enterprise applications dynamically. Driven by AI and dynamic runtime schemas, it enables developers and teams to define, deploy, and scale complex applications through natural language and visual composition—without rebuilding, compiling, or redeploying code.
 
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Backend framework | Node.js + Koa |
-| Database ORM | Sequelize (via `@formai/database`) |
-| API layer | Custom resourcer (`@formai/resourcer`) |
-| Auth | JWT + bcrypt (`@formai/auth`) |
-| ACL | Attribute-based access control (`@formai/acl`) |
-| Frontend | React 18 + Vite |
-| Schema engine | `@formai/schema-engine` |
-| AI integration | OpenAI / Anthropic (`@formai/ai`) |
-| Build tooling | Turborepo + pnpm workspaces |
-| Testing | Vitest |
-| Containerization | Docker + Docker Compose |
+![Formai System Creation](./docs/assets/formai_system_creation_ui.png)
 
 ---
 
-## Quick Start
+## ⚡ Core Characteristics
 
-### Prerequisites
+* **AI-Native Architecture (A2X Engine):** Translates natural language prompts into database schemas, UI layouts, workflows, and mock data. Powered by a unified API layer supporting OpenAI, Anthropic, and other LLMs.
+* **Schema-Driven UI (`@formai/schema-engine`):** Renders highly interactive React interfaces at runtime based on standardized JSON Schema configurations.
+* **Dynamic Collection Management:** Modify, scale, and relate database tables on the fly. Real-time PostgreSQL schemas are synced automatically without service interruption.
+* **Granular Plug-and-Play Extensibility:** Every enterprise feature (ACL, localized translation, audit logs, workflows, dashboards) is a modular plugin obeying a strict lifecycle (`load`, `install`, `upgrade`, `destroy`).
 
-- Node.js >= 20
-- pnpm >= 9 (`npm i -g pnpm`)
-- PostgreSQL 16 (or use Docker)
-- Redis 7 (or use Docker)
+---
 
-### 1. Clone and install
+## 🛠 Tech Stack
 
+* **Monorepo Management:** Turborepo + pnpm workspaces
+* **Frontend:** React 18 + Vite + Vanilla CSS
+* **Backend:** Node.js + Koa + `@formai/resourcer` (dynamic REST router)
+* **Database & Cache:** PostgreSQL (via Sequelize ORM) + Redis
+* **Auth & ACL:** JWT + Attribute-Based Access Control (ABAC)
+* **Testing & Containerization:** Vitest + Docker / Docker Compose
+
+---
+
+## 🚀 Quick Start
+
+### 1. Installation
+Ensure you have Node.js >= 20, pnpm >= 9, and Docker installed.
 ```bash
-git clone <repo-url>
-cd formai  # this rebuild/ directory
+git clone <repo-url> && cd FormAI
 pnpm install
 ```
 
-### 2. Set up environment
-
+### 2. Configure
+Copy the example environment file and configure your API keys (e.g., Database, OpenAI/Anthropic):
 ```bash
 cp .env.example .env
-# Edit .env and set DB credentials, JWT_SECRET, API keys, etc.
 ```
 
-### 3. Start infrastructure (Docker)
-
+### 3. Launch
+Bring up the backing services and start the development environment:
 ```bash
-pnpm docker:up
-# Starts postgres + redis
-```
-
-### 4. Run in development mode
-
-```bash
-# All packages in watch mode
-pnpm dev
-
-# Or individually:
-pnpm dev:server   # API server on :3000
-pnpm dev:web      # Frontend on :5173
-```
-
-### 5. Verify
-
-```bash
-curl http://localhost:3000/api/health
-# {"status":"ok","version":"0.1.0","uptime":5}
+pnpm docker:up   # Starts PostgreSQL & Redis
+pnpm dev         # Launches server (Port 3000) & web app (Port 5173)
 ```
 
 ---
 
-## Project Structure
+## 🧩 Key Architecture Concepts
 
-```
-rebuild/
-├── apps/
-│   ├── server/          # Express/Koa server entry point
-│   │   └── src/
-│   │       ├── index.ts      # Main entry — starts the server
-│   │       ├── app.ts        # Application factory — registers all plugins
-│   │       └── config.ts     # Config from environment variables
-│   └── web/             # React frontend (Vite)
-│       └── src/
-│           ├── App.tsx       # Root component with AI bar + layout
-│           └── main.tsx      # React mount
-│
-├── packages/
-│   ├── core/
-│   │   ├── server/      # @formai/server — Application class, middleware
-│   │   ├── database/    # @formai/database — Sequelize wrapper
-│   │   ├── resourcer/   # @formai/resourcer — REST resourcer
-│   │   ├── auth/        # @formai/auth — JWT utilities
-│   │   ├── acl/         # @formai/acl — Permission engine
-│   │   ├── ai/          # @formai/ai — AI provider abstraction
-│   │   ├── client/      # @formai/client — React client SDK
-│   │   ├── schema-engine/ # @formai/schema-engine — UI schema renderer
-│   │   ├── plugin/      # @formai/plugin — Plugin base class
-│   │   ├── sdk/         # @formai/sdk — HTTP client
-│   │   └── shared/      # @formai/shared — Shared types
-│   │
-│   └── plugins/
-│       ├── collection-manager/  # Dynamic collection management
-│       ├── users/               # User auth & profiles
-│       ├── acl/                 # ACL plugin
-│       ├── ui-schema-storage/   # Persist UI schemas
-│       ├── file-manager/        # File upload/storage
-│       ├── system-settings/     # Global system config
-│       ├── localization/        # i18n support
-│       ├── notification/        # Notification system
-│       ├── workflow/            # Workflow automation
-│       ├── data-visualization/  # Charts & dashboards
-│       ├── import-export/       # Data import/export
-│       ├── backup-restore/      # Database backups
-│       ├── audit-log/           # Audit trail
-│       ├── api-doc/             # Auto API docs
-│       └── theme-editor/        # UI theme customization
-│
-├── docker-compose.yml   # Postgres + Redis + App
-├── Dockerfile           # Multi-stage production build
-├── .env.example         # Environment variable template
-└── turbo.json           # Turborepo pipeline config
-```
-
----
-
-## Development Commands
-
-```bash
-# Install all dependencies
-pnpm install
-
-# Start all in dev mode (watch)
-pnpm dev
-
-# Start server only
-pnpm dev:server
-
-# Start web only
-pnpm dev:web
-
-# Build all packages
-pnpm build
-
-# Run all tests
-pnpm test
-
-# Lint all packages
-pnpm lint
-
-# Clean all build artifacts
-pnpm clean
-
-# Run DB migration
-pnpm db:migrate
-```
-
----
-
-## Docker Deployment
-
-### One-click deploy (all services)
-
-```bash
-pnpm docker:up
-# Starts: postgres, redis, and the app on port 3000
-```
-
-### Stop all services
-
-```bash
-pnpm docker:down
-```
-
-### Build and run manually
-
-```bash
-docker build -t formai .
-docker run -p 3000:3000 \
-  -e DB_HOST=localhost \
-  -e DB_USER=formai \
-  -e DB_PASSWORD=formai \
-  -e DB_NAME=formai \
-  -e JWT_SECRET=your-secret \
-  formai
-```
-
----
-
-## Core Concepts
-
-### Collections
-
-Collections are dynamic database tables defined at runtime. The `collection-manager` plugin stores collection/field definitions in meta-tables and syncs them to the actual database schema.
-
+### 1. Dynamic Database Collections
+Define database schemas dynamically at runtime. The database engine maps definitions to physical tables.
 ```typescript
 app.collection({
   name: 'products',
@@ -209,10 +67,8 @@ app.collection({
 });
 ```
 
-### Schema Engine
-
-The schema engine (`@formai/schema-engine`) renders UI from JSON schema definitions stored in the database. Components are registered globally and resolved at runtime.
-
+### 2. JSON Schema-Driven Interfaces
+Form components and page layouts are stored as JSON and dynamically resolved by the frontend.
 ```json
 {
   "type": "void",
@@ -223,51 +79,32 @@ The schema engine (`@formai/schema-engine`) renders UI from JSON schema definiti
 }
 ```
 
-### A2X Engine (AI-to-X)
-
-The AI layer (`@formai/ai`) abstracts over multiple LLM providers (OpenAI, Anthropic) and exposes a unified interface for generating collections, UI schemas, workflows, and data through natural language.
-
-### Plugins
-
-Every capability is a plugin. Plugins follow a simple 4-hook lifecycle:
-
-- `load()` — Register collections, routes, middleware
-- `install()` — First-time install (seed data, create tables)
-- `upgrade()` — Run version migrations
-- `destroy()` — Cleanup
-
+### 3. Modular Plugin Lifecycle
+Extend platform capabilities with self-contained plugins that manage their own resources and migrations.
 ```typescript
 import { Plugin } from '@formai/plugin';
 
-export default class MyPlugin extends Plugin {
+export default class CustomPlugin extends Plugin {
   async load() {
-    this.defineCollection({ name: 'my_items', fields: [...] });
-    this.registerResource({ name: 'my_items', actions: { list, get, create } });
+    this.defineCollection({ name: 'custom_items', fields: [...] });
+    this.registerResource({ name: 'custom_items', actions: { list, create } });
   }
 }
 ```
 
 ---
 
-## Environment Variables
+## 🐳 Production Deployment
 
-See [`.env.example`](.env.example) for the full list with descriptions.
-
-Key variables:
-
-| Variable | Default | Description |
-|---|---|---|
-| `DB_HOST` | localhost | PostgreSQL host |
-| `DB_PORT` | 5432 | PostgreSQL port |
-| `PORT` | 3000 | HTTP server port |
-| `JWT_SECRET` | (required) | JWT signing secret |
-| `OPENAI_API_KEY` | — | OpenAI API key for AI features |
-| `ANTHROPIC_API_KEY` | — | Anthropic API key |
-| `REDIS_URL` | redis://localhost:6379 | Redis connection URL |
+Use Docker Compose to launch the entire stack in production mode:
+```bash
+pnpm docker:up
+# Build manually:
+docker build -t formai .
+```
 
 ---
 
-## Development Rules
+## 📜 Development Policy
 
-- **Language Policy**: All code, comments, database schemas, API responses, and user interface strings within this project must be written strictly in **English**. This ensures international compatibility, codebase consistency, and seamless translation for global developers.
-
+* **Language Policy:** All code, comments, database schemas, API responses, and user interface strings within this project must be written strictly in **English** to ensure international compatibility and codebase consistency.
