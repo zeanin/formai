@@ -1,0 +1,37 @@
+{
+  "name": "@formai/plugin-apps",
+  "version": "0.1.0",
+  "description": "App management plugin for Formai — enables multi-app platform with role-based menus",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json",
+    "dev": "tsup src/index.ts --format esm,cjs --watch",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@formai/acl": "workspace:*",
+    "@formai/database": "workspace:*",
+    "@formai/plugin": "workspace:*",
+    "@formai/plugin-codex": "workspace:*",
+    "@formai/shared": "workspace:*",
+    "zod": "^3.23.0",
+    "zod-to-json-schema": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "koa": "^2.15.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

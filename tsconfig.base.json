@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "paths": {
+      "@formai/database": ["./packages/core/database/src"],
+      "@formai/server": ["./packages/core/server/src"],
+      "@formai/client": ["./packages/core/client/src"],
+      "@formai/schema-engine": ["./packages/core/schema-engine/src"],
+      "@formai/ai": ["./packages/core/ai/src"],
+      "@formai/acl": ["./packages/core/acl/src"],
+      "@formai/auth": ["./packages/core/auth/src"],
+      "@formai/resourcer": ["./packages/core/resourcer/src"],
+      "@formai/plugin": ["./packages/core/plugin/src"],
+      "@formai/shared": ["./packages/core/shared/src"],
+      "@formai/sdk": ["./packages/core/sdk/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

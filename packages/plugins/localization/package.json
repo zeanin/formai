@@ -1,0 +1,31 @@
+{
+  "name": "@formai/plugin-localization",
+  "version": "0.1.0",
+  "description": "Localization / i18n plugin for Formai",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json",
+    "dev": "tsup src/index.ts --format esm,cjs --watch",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@formai/shared": "workspace:*",
+    "@formai/plugin": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "koa": "^2.15.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

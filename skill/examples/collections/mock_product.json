@@ -1,0 +1,31 @@
+{
+  "name": "products",
+  "title": "Products Catalog",
+  "comment": "Persists catalog data of products sold in the system",
+  "fields": [
+    {
+      "name": "id",
+      "type": "integer",
+      "primaryKey": true,
+      "autoIncrement": true
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "allowNull": false,
+      "comment": "Title of the product catalog entry"
+    },
+    {
+      "name": "price",
+      "type": "decimal",
+      "allowNull": false,
+      "defaultValue": 0.00
+    },
+    {
+      "name": "status",
+      "type": "enum",
+      "values": ["active", "inactive", "draft"],
+      "defaultValue": "draft"
+    }
+  ]
+}

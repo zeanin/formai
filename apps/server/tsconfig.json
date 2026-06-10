@@ -1,0 +1,42 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "composite": false,
+    "paths": {
+      "@formai/database": ["../../packages/core/database/src"],
+      "@formai/server": ["../../packages/core/server/src"],
+      "@formai/client": ["../../packages/core/client/src"],
+      "@formai/schema-engine": ["../../packages/core/schema-engine/src"],
+      "@formai/ai": ["../../packages/core/ai/src"],
+      "@formai/acl": ["../../packages/core/acl/src"],
+      "@formai/auth": ["../../packages/core/auth/src"],
+      "@formai/resourcer": ["../../packages/core/resourcer/src"],
+      "@formai/plugin": ["../../packages/core/plugin/src"],
+      "@formai/shared": ["../../packages/core/shared/src"],
+      "@formai/sdk": ["../../packages/core/sdk/src"],
+      "@formai/plugin-auth": ["../../packages/plugins/auth/src"],
+      "@formai/plugin-ai": ["../../packages/plugins/ai/src"],
+      "@formai/plugin-collection-manager": ["../../packages/plugins/collection-manager/src"],
+      "@formai/plugin-users": ["../../packages/plugins/users/src"],
+      "@formai/plugin-acl": ["../../packages/plugins/acl/src"],
+      "@formai/plugin-ui-schema-storage": ["../../packages/plugins/ui-schema-storage/src"],
+      "@formai/plugin-file-manager": ["../../packages/plugins/file-manager/src"],
+      "@formai/plugin-system-settings": ["../../packages/plugins/system-settings/src"],
+      "@formai/plugin-localization": ["../../packages/plugins/localization/src"],
+      "@formai/plugin-notification": ["../../packages/plugins/notification/src"],
+      "@formai/plugin-workflow": ["../../packages/plugins/workflow/src"],
+      "@formai/plugin-data-visualization": ["../../packages/plugins/data-visualization/src"],
+      "@formai/plugin-import-export": ["../../packages/plugins/import-export/src"],
+      "@formai/plugin-backup-restore": ["../../packages/plugins/backup-restore/src"],
+      "@formai/plugin-audit-log": ["../../packages/plugins/audit-log/src"],
+      "@formai/plugin-api-doc": ["../../packages/plugins/api-doc/src"],
+      "@formai/plugin-theme-editor": ["../../packages/plugins/theme-editor/src"],
+      "@formai/plugin-codex": ["../../packages/plugins/codex/src"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/codex/**/*"]
+}
+
+

@@ -1,0 +1,41 @@
+{
+  "name": "@formai/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Formai server framework built on Koa",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "dev": "tsc --project tsconfig.json --watch",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src/",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@formai/shared": "workspace:*",
+    "@formai/database": "workspace:*",
+    "@formai/resourcer": "workspace:*",
+    "@formai/plugin": "workspace:*",
+    "koa": "^2.15.0",
+    "@koa/cors": "^5.0.0",
+    "@koa/router": "^12.0.0",
+    "koa-bodyparser": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa__cors": "^5.0.0",
+    "@types/koa__router": "^12.0.0",
+    "@types/koa-bodyparser": "^4.3.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "void",
+  "x-uid": "product_page",
+  "x-component": "Page",
+  "properties": {
+    "filter_products": {
+      "type": "void",
+      "x-component": "FilterBlock",
+      "x-component-props": {
+        "collection": "products",
+        "fields": [
+          { "name": "title", "title": "Product Title", "type": "string" },
+          { "name": "status", "title": "Status", "type": "enum", "values": ["active", "inactive", "draft"] }
+        ]
+      }
+    },
+    "table_products": {
+      "type": "array",
+      "x-component": "Table",
+      "x-component-props": {
+        "collection": "products",
+        "columns": [
+          { "title": "ID", "dataIndex": "id", "key": "id" },
+          { "title": "Product Title", "dataIndex": "title", "key": "title" },
+          { "title": "Price", "dataIndex": "price", "key": "price", "render": "amount" },
+          { "title": "Status", "dataIndex": "status", "key": "status", "render": "status" }
+        ]
+      }
+    }
+  }
+}
