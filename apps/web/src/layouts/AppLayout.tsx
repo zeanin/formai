@@ -7,7 +7,6 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
   HomeOutlined,
   UserOutlined,
-  RobotOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
@@ -22,6 +21,8 @@ import {
   MoonOutlined,
 } from '@ant-design/icons';
 import { useDesignMode, useTheme } from '@formai/client';
+import { FormaiRobotIcon } from '../components/FormaiRobotIcon';
+
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -187,7 +188,7 @@ function GlobalAIChatPanel({ onClose, appId, activeMenu }: GlobalAIChatPanelProp
         }}
       >
         <Space>
-          <RobotOutlined style={{ color: token.colorPrimary }} />
+          <FormaiRobotIcon style={{ color: token.colorPrimary }} />
           <Text strong>AI Assistant</Text>
         </Space>
         <Button type="text" size="small" icon={<CloseOutlined />} onClick={onClose} />
@@ -208,7 +209,7 @@ function GlobalAIChatPanel({ onClose, appId, activeMenu }: GlobalAIChatPanelProp
           >
             <Avatar
               size="small"
-              icon={msg.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
+              icon={msg.role === 'user' ? <UserOutlined /> : <FormaiRobotIcon />}
               style={{ background: msg.role === 'user' ? token.colorPrimary : token.colorSuccess, flexShrink: 0 }}
             />
             <div
@@ -229,7 +230,7 @@ function GlobalAIChatPanel({ onClose, appId, activeMenu }: GlobalAIChatPanelProp
         ))}
         {loading && (
           <div style={{ display: 'flex', gap: 8, padding: '4px 0' }}>
-            <Avatar size="small" icon={<RobotOutlined />} style={{ background: token.colorSuccess }} />
+            <Avatar size="small" icon={<FormaiRobotIcon />} style={{ background: token.colorSuccess }} />
             <Spin size="small" />
           </div>
         )}
@@ -433,7 +434,7 @@ export function AppLayout({ currentUser, onSignOut, children }: AppLayoutProps) 
             <Button
               size="small"
               type={aiPanelOpen ? 'primary' : 'default'}
-              icon={<RobotOutlined />}
+              icon={<FormaiRobotIcon />}
               onClick={() => setAiPanelOpen((v) => !v)}
             >
               {!isMobile && 'AI Assistant'}

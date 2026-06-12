@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="32" height="32" fill="none" stroke="#1677ff" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Outer head rounded square -->
+  <rect x="200" y="150" width="624" height="600" rx="80" stroke-width="64" />
+  
+  <!-- Eye connection bridge -->
+  <line x1="380" y1="430" x2="644" y2="430" stroke-width="32" />
+  
+  <!-- Left eye circle -->
+  <circle cx="380" cy="430" r="75" fill="#1677ff" stroke="none" />
+  
+  <!-- Right eye circle -->
+  <circle cx="644" cy="430" r="75" fill="#1677ff" stroke="none" />
+  
+  <!-- Curved smiling mouth -->
+  <path d="M 420 590 Q 512 670 604 590" stroke-width="48" fill="none" />
+  
+  <!-- Stand neck connectors -->
+  <line x1="430" y1="750" x2="430" y2="860" stroke-width="48" />
+  <line x1="594" y1="750" x2="594" y2="860" stroke-width="48" />
+  
+  <!-- Stand base plate -->
+  <line x1="320" y1="860" x2="704" y2="860" stroke-width="64" />
+</svg>

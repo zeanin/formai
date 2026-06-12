@@ -4,7 +4,6 @@ import {
   Tag, Alert, Modal, Collapse, Divider,
 } from 'antd';
 import {
-  RobotOutlined,
   SendOutlined,
   UserOutlined,
   CloseOutlined,
@@ -15,6 +14,7 @@ import {
   ApiOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
+import { FormaiRobotIcon } from './FormaiRobotIcon';
 
 const { Text, Paragraph } = Typography;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -196,7 +196,7 @@ function MessageBubble({ msg, onApprove, onReject, confirmLoading }: {
     >
       <Avatar
         size="small"
-        icon={isUser ? <UserOutlined /> : <RobotOutlined />}
+        icon={isUser ? <UserOutlined /> : <FormaiRobotIcon />}
         style={{
           background: isUser ? token.colorPrimary : token.colorSuccess,
           flexShrink: 0,
@@ -399,7 +399,7 @@ export function RuntimeAIAssistant({
     <Drawer
       title={
         <Space>
-          <RobotOutlined style={{ color: token.colorPrimary }} />
+          <FormaiRobotIcon style={{ color: token.colorPrimary }} />
           <span>AI Data Assistant</span>
           {collectionName && (
             <Tag color="processing" style={{ fontSize: 11 }}>
@@ -464,7 +464,7 @@ export function RuntimeAIAssistant({
           <div style={{ display: 'flex', gap: 8, padding: '4px 0', alignItems: 'center' }}>
             <Avatar
               size="small"
-              icon={<RobotOutlined />}
+              icon={<FormaiRobotIcon />}
               style={{ background: token.colorSuccess }}
             />
             <Space size={4}>
@@ -552,7 +552,7 @@ export function RuntimeAIAssistantTrigger({
           type={isOpen ? 'primary' : 'default'}
           shape="circle"
           size="large"
-          icon={<RobotOutlined />}
+          icon={<FormaiRobotIcon />}
           onClick={onClick}
           style={{
             position: 'fixed',

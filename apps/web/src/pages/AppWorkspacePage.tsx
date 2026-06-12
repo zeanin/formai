@@ -10,13 +10,14 @@ import {
   AppstoreOutlined, ThunderboltOutlined, TeamOutlined,
   MenuOutlined, ReloadOutlined, ArrowLeftOutlined,
   SettingOutlined, PlayCircleOutlined, DashboardOutlined,
-  RobotOutlined, LockOutlined, EditOutlined, BookOutlined,
+  LockOutlined, EditOutlined, BookOutlined,
   SaveOutlined, SyncOutlined, EyeOutlined, SendOutlined,
   UserOutlined, ExclamationCircleOutlined, LoadingOutlined,
   ScheduleOutlined, CheckOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDesignMode, KnowledgeWiki } from '@formai/client';
+import { FormaiRobotIcon } from '../components/FormaiRobotIcon';
 import { AppMenuDesigner } from '../components/AppMenuDesigner';
 import { CollectionSkillsPanel } from '../components/CollectionSkillsPanel';
 import { CollectionFieldsPanel } from '../components/CollectionFieldsPanel';
@@ -155,7 +156,7 @@ function AppCollectionsTab({ appId, currentRole }: { appId: string; currentRole?
         key: 'skills',
         label: (
           <Space size={4}>
-            <RobotOutlined />
+            <FormaiRobotIcon />
             AI Skills
             <Tag color="blue" style={{ fontSize: 10, padding: '0 4px', margin: 0 }}>Runtime</Tag>
           </Space>
@@ -1074,7 +1075,7 @@ function WikiTabContent({ app, appId }: { app: any; appId: string }) {
           Obsidian-Style Business Domain Knowledge Base — maps domain concepts and their relationships using a graph map.
         </Text>
         <Button
-          icon={<RobotOutlined />}
+          icon={<FormaiRobotIcon />}
           loading={syncing}
           onClick={handleSyncWiki}
           style={{
@@ -2061,7 +2062,7 @@ export function AppWorkspacePage() {
                 <Card
                   title={
                     <Space>
-                      <RobotOutlined style={{ color: '#1677ff' }} />
+                      <FormaiRobotIcon style={{ color: '#1677ff' }} />
                       <span style={{ fontWeight: 600 }}>✨ AI Workspace Copilot</span>
                     </Space>
                   }
@@ -2098,7 +2099,7 @@ export function AppWorkspacePage() {
                         >
                           <Avatar
                             size="small"
-                            icon={isUser ? <UserOutlined /> : <RobotOutlined />}
+                            icon={isUser ? <UserOutlined /> : <FormaiRobotIcon />}
                             style={{
                               background: isUser ? '#1677ff' : '#52c41a',
                               flexShrink: 0,
@@ -2117,7 +2118,7 @@ export function AppWorkspacePage() {
                                 }}
                               >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                                  <RobotOutlined spin={copilotLoading} style={{ color: '#722ed1', fontSize: 16 }} />
+                                  <FormaiRobotIcon spin={copilotLoading} style={{ color: '#722ed1', fontSize: 16 }} />
                                   <Text strong style={{ color: '#531dab', fontSize: 13 }}>FormAI Blueprint Architect</Text>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -2242,7 +2243,7 @@ export function AppWorkspacePage() {
                       <div style={{ display: 'flex', gap: 8, padding: '6px 0', alignItems: 'flex-start' }}>
                         <Avatar
                           size="small"
-                          icon={<RobotOutlined />}
+                          icon={<FormaiRobotIcon />}
                           style={{ background: '#52c41a', marginTop: 2 }}
                         />
                         <Space size={4} direction="vertical" style={{ display: 'flex', alignItems: 'flex-start' }}>

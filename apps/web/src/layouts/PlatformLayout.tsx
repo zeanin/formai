@@ -10,7 +10,6 @@ import {
   FolderOutlined,
   SettingOutlined,
   AppstoreAddOutlined,
-  RobotOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   EditOutlined,
@@ -22,9 +21,11 @@ import {
   ScheduleOutlined,
   BookOutlined,
 } from '@ant-design/icons';
+import { FormaiRobotIcon } from '../components/FormaiRobotIcon';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
+
 
 const PLATFORM_MENU = [
   { key: '/admin/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
@@ -128,8 +129,8 @@ export function PlatformLayout({ currentUser, onSignOut, children }: PlatformLay
               style={{ padding: '0 8px' }}
             />
           )}
-          <RobotOutlined style={{ fontSize: 22, color: token.colorPrimary }} />
-          <Title level={4} style={{ margin: 0, color: token.colorText, fontSize: isMobile ? 16 : 20 }}>Formai</Title>
+          <FormaiRobotIcon style={{ fontSize: 28, color: token.colorPrimary }} />
+          <Title level={4} style={{ margin: 0, color: token.colorText, fontSize: isMobile ? 18 : 22 }}>Formai</Title>
           {!isMobile && <Tag color="orange" style={{ marginLeft: 4 }}>Admin</Tag>}
         </div>
         <Space size="middle">

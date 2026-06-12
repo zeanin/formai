@@ -5,7 +5,6 @@ import {
 } from 'antd';
 import {
   ApiOutlined,
-  RobotOutlined,
   CheckCircleOutlined,
   StopOutlined,
   ExclamationCircleOutlined,
@@ -14,6 +13,7 @@ import {
   PlusOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
+import { FormaiRobotIcon } from './FormaiRobotIcon';
 import { SkillExecutionLogsPanel } from './SkillExecutionLogsPanel';
 import { CustomSkillForm } from './CustomSkillForm';
 
@@ -248,7 +248,7 @@ function SkillsManagementTab({
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <Space size={8}>
-          <RobotOutlined style={{ color: '#1677ff' }} />
+          <FormaiRobotIcon style={{ color: '#1677ff' }} />
           <Text><Text strong>{enabledCount}</Text><Text type="secondary"> / {skills.length} Enabled</Text></Text>
           {enabledCount > 0 && <Badge status="processing" text={<Text style={{ fontSize: 11 }} type="secondary">Available to AI</Text>} />}
         </Space>
@@ -283,7 +283,7 @@ function SkillsManagementTab({
         locale={{
           emptyText: (
             <Empty
-              image={<RobotOutlined style={{ fontSize: 40, color: '#d9d9d9' }} />}
+              image={<FormaiRobotIcon style={{ fontSize: 40, color: '#d9d9d9' }} />}
               imageStyle={{ height: 50 }}
               description={
                 <Space direction="vertical" size={2}>

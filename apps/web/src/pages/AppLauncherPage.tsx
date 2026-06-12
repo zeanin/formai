@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   AppstoreOutlined,
   ArrowRightOutlined,
-  RobotOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
+import { FormaiRobotIcon } from '../components/FormaiRobotIcon';
 
 const { Title, Text, Paragraph } = Typography;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -109,7 +109,7 @@ export function AppLauncherPage({ currentUser, currentRole }: AppLauncherPagePro
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <RobotOutlined style={{ fontSize: isMobile ? 28 : 32, color: token.colorPrimary, flexShrink: 0 }} />
+          <FormaiRobotIcon style={{ fontSize: isMobile ? 28 : 32, color: token.colorPrimary, flexShrink: 0 }} />
           <div>
             <Title level={3} style={{ margin: 0, fontSize: isMobile ? 18 : 24 }}>
               Welcome back, {currentUser?.nickname || currentUser?.username}

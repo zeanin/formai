@@ -42,7 +42,6 @@ import {
 import {
   UserOutlined,
   LockOutlined,
-  RobotOutlined,
   DatabaseOutlined,
   ThunderboltOutlined,
   AppstoreOutlined,
@@ -71,6 +70,7 @@ import { AppManagementPage } from './pages/AppManagementPage';
 import { AppWorkspacePage } from './pages/AppWorkspacePage';
 import { AdminGuard } from './guards/AdminGuard';
 import { AppGuard } from './guards/AppGuard';
+import { FormaiRobotIcon } from './components/FormaiRobotIcon';
 
 const { Title, Text, Paragraph } = Typography;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -134,7 +134,7 @@ function LoginPage({ onLogin }: { onLogin: (user: any, role: string) => void }) 
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: token.colorBgLayout }}>
       <Card style={{ width: 380, boxShadow: token.boxShadow }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <RobotOutlined style={{ fontSize: 40, color: token.colorPrimary }} />
+          <FormaiRobotIcon style={{ fontSize: 40, color: token.colorPrimary }} />
           <Title level={3} style={{ margin: '12px 0 4px' }}>Formai</Title>
           <Text type="secondary">AI-Native Application Platform</Text>
         </div>

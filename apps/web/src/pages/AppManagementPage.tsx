@@ -8,10 +8,11 @@ import {
   PlusOutlined, DeleteOutlined, ReloadOutlined,
   AppstoreOutlined, RightOutlined, DatabaseOutlined,
   ThunderboltOutlined, EyeOutlined, InboxOutlined,
-  SendOutlined, EditOutlined, TeamOutlined, RobotOutlined,
+  SendOutlined, EditOutlined, TeamOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { FormaiRobotIcon } from '../components/FormaiRobotIcon';
 
 const { Title, Text, Paragraph } = Typography;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -347,7 +348,7 @@ export function AppManagementPage() {
             background: 'linear-gradient(135deg, #f9f0ff 0%, #e6f7ff 100%)',
             boxShadow: '0 4px 12px rgba(114, 46, 209, 0.15)'
           }}>
-            <RobotOutlined spin style={{ fontSize: 40, color: '#722ed1' }} />
+            <FormaiRobotIcon spin style={{ fontSize: 40, color: '#722ed1' }} />
           </div>
           <div>
             <Title level={4} style={{ margin: 0 }}>FormAI Architect</Title>

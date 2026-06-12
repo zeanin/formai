@@ -4,7 +4,6 @@ import {
   Tag, Divider,
 } from 'antd';
 import {
-  RobotOutlined,
   SendOutlined,
   UserOutlined,
   CloseOutlined,
@@ -13,6 +12,7 @@ import {
   ReloadOutlined,
   BulbOutlined,
 } from '@ant-design/icons';
+import { FormaiRobotIcon } from '../components/FormaiRobotIcon';
 import { usePageAIContext } from '../providers/PageAIContextProvider';
 
 const { Text } = Typography;
@@ -169,7 +169,7 @@ export function PageAIAssistant({ open, onClose }: PageAIAssistantProps) {
     <Drawer
       title={
         <Space>
-          <RobotOutlined style={{ color: token.colorPrimary }} />
+          <FormaiRobotIcon style={{ color: token.colorPrimary }} />
           <span>Page AI Assistant</span>
           {context?.collectionName && (
             <Tag color="processing" style={{ fontSize: 11 }}>
@@ -223,7 +223,7 @@ export function PageAIAssistant({ open, onClose }: PageAIAssistantProps) {
           >
             <Avatar
               size="small"
-              icon={msg.role === 'user' ? <UserOutlined /> : <RobotOutlined />}
+              icon={msg.role === 'user' ? <UserOutlined /> : <FormaiRobotIcon />}
               style={{
                 background: msg.role === 'user' ? token.colorPrimary : token.colorSuccess,
                 flexShrink: 0,
@@ -253,7 +253,7 @@ export function PageAIAssistant({ open, onClose }: PageAIAssistantProps) {
         ))}
         {loading && (
           <div style={{ display: 'flex', gap: 8, padding: '4px 0' }}>
-            <Avatar size="small" icon={<RobotOutlined />} style={{ background: token.colorSuccess }} />
+            <Avatar size="small" icon={<FormaiRobotIcon />} style={{ background: token.colorSuccess }} />
             <Spin size="small" />
           </div>
         )}
@@ -307,7 +307,7 @@ export function PageAIAssistantTrigger({ onClick, isOpen }: PageAIAssistantTrigg
           type={isOpen ? 'primary' : 'default'}
           shape="circle"
           size="large"
-          icon={<RobotOutlined />}
+          icon={<FormaiRobotIcon />}
           onClick={onClick}
           style={{
             position: 'fixed',

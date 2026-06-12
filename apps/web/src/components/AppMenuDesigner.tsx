@@ -5,8 +5,9 @@ import {
 } from 'antd';
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, FileOutlined,
-  FolderOutlined, LinkOutlined, HolderOutlined, RobotOutlined, ThunderboltOutlined,
+  FolderOutlined, LinkOutlined, HolderOutlined, ThunderboltOutlined,
 } from '@ant-design/icons';
+import { FormaiRobotIcon } from './FormaiRobotIcon';
 import type { DataNode } from 'antd/es/tree';
 
 const { Text } = Typography;
@@ -598,7 +599,7 @@ export function AppMenuDesigner({ appId, appName }: AppMenuDesignerProps) {
           Drag to reorder. Groups can contain child pages.
         </Text>
         <Space>
-          <Button icon={<RobotOutlined />} size="small" type="primary" onClick={() => setAiModalOpen(true)} style={{ background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)', border: 'none' }}>
+          <Button icon={<FormaiRobotIcon />} size="small" type="primary" onClick={() => setAiModalOpen(true)} style={{ background: 'linear-gradient(135deg, #1677ff 0%, #722ed1 100%)', border: 'none' }}>
             ✨ AI Generate Menus
           </Button>
           <Button icon={<PlusOutlined />} size="small" onClick={() => openCreateForParent(null)}>
@@ -643,7 +644,7 @@ export function AppMenuDesigner({ appId, appName }: AppMenuDesignerProps) {
       <Modal
         title={
           <Space>
-            <RobotOutlined style={{ color: '#722ed1' }} />
+            <FormaiRobotIcon style={{ color: '#722ed1' }} />
             <span>AI Menu &amp; Page Generator</span>
           </Space>
         }
