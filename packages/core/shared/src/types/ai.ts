@@ -62,6 +62,7 @@ export interface AgentResult {
   messages: AIMessage[];
   toolResults?: Array<{ toolCallId: string; result: any }>;
   usage?: TokenUsage;
+  pendingConfirmation?: any;
 }
 
 export interface TokenUsage {

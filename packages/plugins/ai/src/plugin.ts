@@ -85,6 +85,57 @@ export default class AIPlugin extends Plugin {
       ],
     });
 
+    // Define agentSessions collection
+    this.defineCollection({
+      name: 'agentSessions',
+      title: 'Agent Sessions',
+      tableName: 'agent_sessions',
+      fields: [
+        { name: 'id', type: 'uuid', primaryKey: true, defaultValue: 'UUIDV4' },
+        { name: 'name', type: 'string', allowNull: false },
+        { name: 'status', type: 'enum', values: ['pending', 'running', 'waiting_approval', 'paused', 'completed', 'failed'], defaultValue: 'pending', allowNull: false },
+        { name: 'triggeredBy', type: 'string', allowNull: false },
+        { name: 'systemPrompt', type: 'text', allowNull: false },
+        { name: 'initialPrompt', type: 'text', allowNull: false },
+        { name: 'currentCheckpointId', type: 'uuid', allowNull: true },
+      ],
+    });
+
+    // Define agentCheckpoints collection
+    this.defineCollection({
+      name: 'agentCheckpoints',
+      title: 'Agent Checkpoints',
+      tableName: 'agent_checkpoints',
+      fields: [
+        { name: 'id', type: 'uuid', primaryKey: true, defaultValue: 'UUIDV4' },
+        { name: 'sessionId', type: 'uuid', allowNull: false },
+        { name: 'stepNumber', type: 'integer', allowNull: false },
+        { name: 'messages', type: 'jsonb', allowNull: false },
+        { name: 'variables', type: 'jsonb', defaultValue: null },
+        { name: 'tokenUsage', type: 'jsonb', defaultValue: null },
+      ],
+    });
+
+    // Define agentTraces collection
+    this.defineCollection({
+      name: 'agentTraces',
+      title: 'Agent Traces',
+      tableName: 'agent_traces',
+      fields: [
+        { name: 'id', type: 'uuid', primaryKey: true, defaultValue: 'UUIDV4' },
+        { name: 'sessionId', type: 'uuid', allowNull: false },
+        { name: 'parentId', type: 'uuid', allowNull: true },
+        { name: 'agentName', type: 'string', allowNull: false },
+        { name: 'stepType', type: 'string', allowNull: false }, // thought, tool_call, sub_agent_call, verification
+        { name: 'title', type: 'string', allowNull: false },
+        { name: 'input', type: 'jsonb', defaultValue: null },
+        { name: 'output', type: 'jsonb', defaultValue: null },
+        { name: 'durationMs', type: 'integer', allowNull: true },
+        { name: 'status', type: 'string', defaultValue: 'success' },
+        { name: 'errorMessage', type: 'text', allowNull: true },
+      ],
+    });
+
     // ── LLM setup ───────────────────────────────────────────────────────────
 
     this.llm = new LLMManager();
@@ -212,7 +263,7 @@ export default class AIPlugin extends Plugin {
       this.app.skillLogger = this.skillLogger;
     });
 
-    this.agentRuntime = new AgentRuntime(this.llm);
+    this.agentRuntime = new AgentRuntime(this.llm, this.db, this.skillRegistry);
     this.app.agentRuntime = this.agentRuntime;
 
     // ── REST routes ─────────────────────────────────────────────────────────
@@ -220,6 +271,151 @@ export default class AIPlugin extends Plugin {
     this.app.use(async (ctx: Context, next: Next) => {
       if (!ctx.path.startsWith('/api/ai')) {
         return next();
+      }
+
+      // ── Managed Agents Routes ──────────────────────────────────────────
+
+      // POST /api/ai/managed-agents/sessions — Create a new agent session
+      if (ctx.path === '/api/ai/managed-agents/sessions' && ctx.method === 'POST') {
+        if (!aiRequireLogin(ctx)) return;
+        const { name, initialPrompt, systemPrompt } = (ctx as any).request.body ?? {};
+        if (!name || !initialPrompt) {
+          ctx.status = 400;
+          ctx.body = { errors: [{ message: 'name and initialPrompt are required', code: 'VALIDATION_ERROR' }] };
+          return;
+        }
+
+        try {
+          const sessionRepo = this.db.getRepository('agentSessions');
+          const sessionId = require('crypto').randomUUID();
+          const session = await sessionRepo.create({
+            values: {
+              id: sessionId,
+              name,
+              status: 'pending',
+              triggeredBy: (ctx as any).state?.currentUser?.id || 'anonymous',
+              systemPrompt: systemPrompt || 'You are a helpful assistant.',
+              initialPrompt,
+            },
+          });
+          ctx.body = { data: session };
+        } catch (err: any) {
+          ctx.status = 500;
+          ctx.body = { errors: [{ message: err.message, code: 'SESSION_CREATE_ERROR' }] };
+        }
+        return;
+      }
+
+      // POST /api/ai/managed-agents/sessions/:id/run — Execute/Resume agent session
+      const runSessionMatch = ctx.path.match(/^\/api\/ai\/managed-agents\/sessions\/([^/]+)\/run$/);
+      if (runSessionMatch && ctx.method === 'POST') {
+        if (!aiRequireLogin(ctx)) return;
+        const sessionId = decodeURIComponent(runSessionMatch[1]);
+        const { maxIterations } = (ctx as any).request.body ?? {};
+
+        try {
+          const sessionRepo = this.db.getRepository('agentSessions');
+          const session = await sessionRepo.findOne({ filter: { id: sessionId } });
+          if (!session) {
+            ctx.status = 404;
+            ctx.body = { errors: [{ message: `Session ${sessionId} not found`, code: 'NOT_FOUND' }] };
+            return;
+          }
+
+          if (session.status === 'completed' || session.status === 'failed') {
+            ctx.status = 400;
+            ctx.body = { errors: [{ message: `Session ${sessionId} is already ${session.status}`, code: 'BAD_REQUEST' }] };
+            return;
+          }
+
+          await sessionRepo.update({
+            filterByTk: sessionId,
+            values: { status: 'running' },
+          });
+
+          const activeProviderName = (this.llm as any).defaultProvider || 'openai';
+          const activeProvider = this.llm.getProvider(activeProviderName);
+          const activeModel = (activeProvider as any).defaultModel || 'gpt-4o';
+
+          const agent = {
+            id: 'runtime-agent',
+            name: session.name,
+            description: 'Managed runtime execution agent',
+            systemPrompt: session.systemPrompt,
+            model: activeModel,
+            provider: activeProviderName,
+            tools: this.skillRegistry.getAvailableTools({
+              userId: (ctx as any).state?.currentUser?.id,
+              roles: [(ctx as any).state?.currentRole],
+            }),
+            temperature: 0.3,
+            maxTokens: 2048,
+          };
+
+          this.agentRuntime.execute(agent, session.initialPrompt, {
+            sessionId,
+            user: {
+              userId: (ctx as any).state?.currentUser?.id,
+              roles: [(ctx as any).state?.currentRole],
+            },
+            maxIterations: maxIterations || 10,
+          }).catch((err: any) => {
+            console.error(`[Managed Agent] Background execution error for session ${sessionId}:`, err);
+          });
+
+          ctx.body = { data: { sessionId, status: 'running' } };
+        } catch (err: any) {
+          ctx.status = 500;
+          ctx.body = { errors: [{ message: err.message, code: 'SESSION_RUN_ERROR' }] };
+        }
+        return;
+      }
+
+      // POST /api/ai/managed-agents/sessions/:id/approve — Human-in-the-loop confirmation
+      const approveMatch = ctx.path.match(/^\/api\/ai\/managed-agents\/sessions\/([^/]+)\/approve$/);
+      if (approveMatch && ctx.method === 'POST') {
+        if (!aiRequireLogin(ctx)) return;
+        const sessionId = decodeURIComponent(approveMatch[1]);
+        const { action, overrideContent } = (ctx as any).request.body ?? {};
+
+        if (!action || !['approve', 'reject'].includes(action)) {
+          ctx.status = 400;
+          ctx.body = { errors: [{ message: 'action must be approve or reject', code: 'VALIDATION_ERROR' }] };
+          return;
+        }
+
+        try {
+          const approved = action === 'approve';
+          this.agentRuntime.resume(sessionId, approved, overrideContent).catch((err: any) => {
+            console.error(`[Managed Agent] Resume execution error for session ${sessionId}:`, err);
+          });
+
+          ctx.body = { data: { sessionId, status: approved ? 'resuming' : 'cancelling' } };
+        } catch (err: any) {
+          ctx.status = 500;
+          ctx.body = { errors: [{ message: err.message, code: 'SESSION_APPROVE_ERROR' }] };
+        }
+        return;
+      }
+
+      // GET /api/ai/managed-agents/sessions/:id/traces — Retrieve trace logs
+      const tracesMatch = ctx.path.match(/^\/api\/ai\/managed-agents\/sessions\/([^/]+)\/traces$/);
+      if (tracesMatch && ctx.method === 'GET') {
+        if (!aiRequireLogin(ctx)) return;
+        const sessionId = decodeURIComponent(tracesMatch[1]);
+
+        try {
+          const traceRepo = this.db.getRepository('agentTraces');
+          const list = await traceRepo.find({
+            filter: { sessionId },
+            sort: ['createdAt'],
+          });
+          ctx.body = { data: list };
+        } catch (err: any) {
+          ctx.status = 500;
+          ctx.body = { errors: [{ message: err.message, code: 'SESSION_TRACES_ERROR' }] };
+        }
+        return;
       }
 
       // ── Runtime Routes ─────────────────────────────────────────────────

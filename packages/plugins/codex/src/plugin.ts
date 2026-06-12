@@ -13,12 +13,17 @@ export default class CodexPlugin extends Plugin {
   async load(): Promise<void> {
     const config = this.app.config?.ai || {};
     
+    // Resolve codexPathOverride (checks config, env, and local project binary)
+    const localCodexBin = path.join(__dirname, '..', 'bin', 'codex');
+    const codexPathOverride = config.codexPath || process.env.CODEX_PATH || process.env.CODEX_BIN || (fs.existsSync(localCodexBin) ? localCodexBin : undefined);
+
     // Instantiate the Codex client with default credentials from config or environment
     const codexClient = new Codex({
       apiKey: config.openai?.apiKey || config.openaiApiKey || process.env.OPENAI_API_KEY,
       baseUrl: config.openai?.baseURL || config.openai?.baseUrl || config.openaiBaseUrl || process.env.OPENAI_BASE_URL,
       daemonUrl: config.daemonUrl || process.env.CODEX_DAEMON_URL,
       socketPath: config.socketPath || process.env.CODEX_SOCKET_PATH,
+      codexPathOverride,
     });
 
     // Make codex client available globally on the FormAI application instance

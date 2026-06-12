@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Spin, Empty, Typography, Space } from 'antd';
+import { Card, Spin, Empty, Typography, Space, theme } from 'antd';
 import { useAPIClient } from '../../providers/APIClientProvider';
 
 export interface ChartBlockProps {
   collection?: string;
-  chartType?: 'bar' | 'line' | 'pie';
+  chartType?: 'bar' | 'line' | 'pie' | 'donut';
   xField?: string;
   yField?: string;
   title?: string;
@@ -27,6 +27,12 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const apiClient = useAPIClient();
+  const { token } = theme.useToken();
+
+  // Dynamic theme colors
+  const gridColor = token.colorBorderSecondary;
+  const axisColor = token.colorBorder;
+  const labelColor = token.colorTextDescription;
 
   useEffect(() => {
     const handleFilterChange = (e: Event) => {
@@ -138,8 +144,8 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
           const valLabel = Math.round(maxVal * ratio);
           return (
             <g key={i}>
-              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke="#f0f0f0" strokeDasharray="4 4" />
-              <text x={paddingLeft - 8} y={y + 4} textAnchor="end" fontSize="10" fill="#8c8c8c">{valLabel}</text>
+              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke={gridColor} strokeDasharray="4 4" />
+              <text x={paddingLeft - 8} y={y + 4} textAnchor="end" fontSize="10" fill={labelColor}>{valLabel}</text>
             </g>
           );
         })}
@@ -179,7 +185,7 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
                 y={height - paddingBottom + 16}
                 textAnchor="middle"
                 fontSize="9"
-                fill="#595959"
+                fill={labelColor}
                 style={{
                   fontWeight: hoveredIndex === i ? 'bold' : 'normal',
                 }}
@@ -191,8 +197,8 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
         })}
 
         {/* X and Y axes */}
-        <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} stroke="#bfbfbf" />
-        <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} stroke="#bfbfbf" />
+        <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} stroke={axisColor} />
+        <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} stroke={axisColor} />
       </svg>
     );
   };
@@ -204,7 +210,17 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
       return { x, y, val: d.value, label: d.name };
     });
 
-    const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    // Make smooth curved line (Bezier Spline)
+    let pathD = '';
+    if (points.length > 0) {
+      pathD = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const dx = (p1.x - p0.x) / 2;
+        pathD += ` C ${p0.x + dx} ${p0.y}, ${p1.x - dx} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+    }
 
     return (
       <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%">
@@ -214,8 +230,8 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
           const valLabel = Math.round(maxVal * ratio);
           return (
             <g key={i}>
-              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke="#f0f0f0" strokeDasharray="4 4" />
-              <text x={paddingLeft - 8} y={y + 4} textAnchor="end" fontSize="10" fill="#8c8c8c">{valLabel}</text>
+              <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} stroke={gridColor} strokeDasharray="4 4" />
+              <text x={paddingLeft - 8} y={y + 4} textAnchor="end" fontSize="10" fill={labelColor}>{valLabel}</text>
             </g>
           );
         })}
@@ -253,20 +269,20 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
               cx={p.x}
               cy={p.y}
               r={hoveredIndex === i ? 6 : 4}
-              fill="#fff"
+              fill={token.colorBgContainer}
               stroke="#1677ff"
               strokeWidth="2"
               style={{ transition: 'all 0.1s' }}
             />
-            <text x={p.x} y={height - paddingBottom + 16} textAnchor="middle" fontSize="9" fill="#595959">
+            <text x={p.x} y={height - paddingBottom + 16} textAnchor="middle" fontSize="9" fill={labelColor}>
               {p.label.length > 8 ? `${p.label.substring(0, 6)}...` : p.label}
             </text>
           </g>
         ))}
 
         {/* Axes */}
-        <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} stroke="#bfbfbf" />
-        <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} stroke="#bfbfbf" />
+        <line x1={paddingLeft} y1={height - paddingBottom} x2={width - paddingRight} y2={height - paddingBottom} stroke={axisColor} />
+        <line x1={paddingLeft} y1={paddingTop} x2={paddingLeft} y2={height - paddingBottom} stroke={axisColor} />
       </svg>
     );
   };
@@ -316,10 +332,19 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
                 transition: 'all 0.2s',
               }}
             >
-              <path d={pathD} fill={colors[i % colors.length]} stroke="#fff" strokeWidth="2" />
+              <path d={pathD} fill={colors[i % colors.length]} stroke={token.colorBgContainer} strokeWidth="2" />
             </g>
           );
         })}
+
+        {/* If donut mode, overlay a circle in the center */}
+        {(chartType === 'donut' || chartType === 'pie') && chartType === 'donut' && (
+          <>
+            <circle cx={cx} cy={cy} r={r * 0.65} fill={token.colorBgContainer} />
+            <text x={cx} y={cy - 4} textAnchor="middle" fontSize="10" fill={token.colorTextDescription}>Total</text>
+            <text x={cx} y={cy + 12} textAnchor="middle" fontSize="14" fontWeight="bold" fill={token.colorText}>{total.toLocaleString()}</text>
+          </>
+        )}
 
         {/* Legends on the right side */}
         <g transform={`translate(${cx + r + 30}, 30)`}>
@@ -328,7 +353,7 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
             return (
               <g key={i} transform={`translate(0, ${i * 20})`}>
                 <rect width="12" height="12" fill={colors[i % colors.length]} rx="2" />
-                <text x="18" y="10" fontSize="10" fill="#595959" style={{ fontWeight: hoveredIndex === i ? 'bold' : 'normal' }}>
+                <text x="18" y="10" fontSize="10" fill={token.colorText} style={{ fontWeight: hoveredIndex === i ? 'bold' : 'normal' }}>
                   {d.name.length > 12 ? `${d.name.substring(0, 10)}...` : d.name} ({percentage}%)
                 </text>
               </g>
@@ -344,7 +369,7 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
       title={title || `${collection?.toUpperCase()} Analytics`}
       style={{
         borderRadius: 8,
-        border: '1px solid #f0f0f0',
+        border: `1px solid ${token.colorBorderSecondary}`,
         boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
         position: 'relative',
         overflow: 'visible',
@@ -355,18 +380,19 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
       <div style={{ position: 'relative', height: 240, overflow: 'visible' }}>
         {chartType === 'bar' && renderBarChart()}
         {chartType === 'line' && renderLineChart()}
-        {chartType === 'pie' && renderPieChart()}
+        {(chartType === 'pie' || chartType === 'donut') && renderPieChart()}
 
         {/* Hover Tooltip */}
         {hoveredIndex !== null && (
           <div
             style={{
               position: 'absolute',
-              left: chartType === 'pie' ? (width / 2 - 40 + (hoveredIndex * 2)) : tooltipPos.x,
-              top: chartType === 'pie' ? (height / 2 - 20) : tooltipPos.y,
+              left: chartType === 'pie' || chartType === 'donut' ? (width / 2 - 40 + (hoveredIndex * 2)) : tooltipPos.x,
+              top: chartType === 'pie' || chartType === 'donut' ? (height / 2 - 20) : tooltipPos.y,
               transform: 'translate(-50%, -100%)',
-              background: 'rgba(0, 0, 0, 0.85)',
-              color: '#fff',
+              background: token.colorBgElevated,
+              border: `1px solid ${token.colorBorderSecondary}`,
+              color: token.colorText,
               padding: '6px 10px',
               borderRadius: '4px',
               fontSize: '11px',
@@ -377,10 +403,10 @@ export const ChartBlock: React.FC<ChartBlockProps> = ({
               whiteSpace: 'nowrap',
             }}
           >
-            <Typography.Text style={{ color: '#fff', fontWeight: 'bold', display: 'block' }}>
+            <Typography.Text style={{ color: token.colorText, fontWeight: 'bold', display: 'block' }}>
               {data[hoveredIndex].name}
             </Typography.Text>
-            <Typography.Text style={{ color: '#bae7ff', display: 'block' }}>
+            <Typography.Text style={{ color: token.colorPrimary, display: 'block' }}>
               {yField.toUpperCase()}: {data[hoveredIndex].value.toLocaleString()}
             </Typography.Text>
           </div>

@@ -1089,6 +1089,9 @@ export async function autoGenerateAppModules(ctx: any, app: any, description: st
     delete baseEnv.CODEX_DAEMON_URL;
     delete baseEnv.CODEX_SOCKET_PATH;
 
+    // Resolve codexPathOverride from global client
+    const globalCodexPathOverride = (ctx as any).app.codex?.options?.codexPathOverride;
+
     // Initialize isolated Codex instances (enforcing direct CLI spawning)
     const dbCodex = new Codex({
       apiKey: llmProviderConfig.apiKey,
@@ -1096,6 +1099,7 @@ export async function autoGenerateAppModules(ctx: any, app: any, description: st
       llmProvider: llmProviderConfig,
       daemonUrl: undefined,
       socketPath: undefined,
+      codexPathOverride: globalCodexPathOverride,
       env: { ...baseEnv, CODEX_HOME: dbHome },
     });
 
@@ -1105,6 +1109,7 @@ export async function autoGenerateAppModules(ctx: any, app: any, description: st
       llmProvider: llmProviderConfig,
       daemonUrl: undefined,
       socketPath: undefined,
+      codexPathOverride: globalCodexPathOverride,
       env: { ...baseEnv, CODEX_HOME: uiHome },
     });
 
@@ -1114,6 +1119,7 @@ export async function autoGenerateAppModules(ctx: any, app: any, description: st
       llmProvider: llmProviderConfig,
       daemonUrl: undefined,
       socketPath: undefined,
+      codexPathOverride: globalCodexPathOverride,
       env: { ...baseEnv, CODEX_HOME: flowHome },
     });
 

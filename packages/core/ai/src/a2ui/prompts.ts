@@ -13,7 +13,18 @@ export const PageBlueprintZod = z.object({
   blocks: z.array(
     z.object({
       id: z.string().describe('snake_case identifier for this block (e.g. filterCard, mainTable)'),
-      type: z.enum(['FilterBlock', 'TableBlock', 'ActionDrawerBlock', 'KanbanBlock', 'DetailsBlock']),
+      type: z.enum([
+        'FilterBlock',
+        'TableBlock',
+        'ActionDrawerBlock',
+        'KanbanBlock',
+        'DetailsBlock',
+        'ChartBlock',
+        'StatisticBlock',
+        'TimelineBlock',
+        'CalendarBlock',
+        'StepsBlock',
+      ]),
       title: z.string().describe('Display title of the block'),
       fields: z.array(z.string()).describe('List of database field names to include in this block'),
       actions: z.array(
@@ -42,12 +53,18 @@ Each node in the schema has:
 - title: Display title
 - name: Field name (for data binding)
 
-## Layout Patterns (Enterprise 3-stage Layout Pattern)
-A standard, premium, production-ready enterprise page MUST strictly conform to the following layout:
-1. Root Page Container: type='void', x-component='Page', with layoutGrid (type='void', x-component='Grid') inside.
-2. Advanced Filter Card (FilterBlock): Located at the very top. type='void', x-component='FilterBlock', with x-component-props.fields array containing fields to filter.
-3. Toolbar / Action Bar (ActionBar): type='void', x-component='Space', containing action buttons.
-4. Main Data Grid (Table): type='array', x-component='Table', with pagination, sorter, and selection props.
+## Layout Patterns
+- Standard CRUD Page:
+  1. Root Page Container: type='void', x-component='Page', with layoutGrid (type='void', x-component='Grid') inside.
+  2. Advanced Filter Card (FilterBlock): Located at the very top.
+  3. Toolbar / Action Bar (ActionBar): type='void', x-component='Space', containing action buttons.
+  4. Main Data Grid (Table): type='array', x-component='Table', with pagination, sorter, and selection.
+- Dashboard Page:
+  If the user requests visual analytics, metrics, dashboards, or charts:
+  1. Root Page Container: type='void', x-component='Page', with layoutGrid (type='void', x-component='Grid') inside.
+  2. StatisticBlocks (KPI Cards) at the top, grouped side-by-side.
+  3. ChartBlocks (bar, line, pie, donut) arranged side-by-side in grid columns.
+  4. Main lists, Kanban, or other boards underneath.
 
 ## Available Business & Action Components
 - FilterBlock: Multi-field advanced search filter panel. Props: fields [{ name, title, type: 'string'|'integer'|'float'|'boolean'|'date'|'datetime'|'enum', values: string[] }]. Automatically reloads Table data on search.
@@ -60,7 +77,13 @@ A standard, premium, production-ready enterprise page MUST strictly conform to t
 - StatusBadge: Colored tag for status fields. Props: value, optionMap {[key]: {color, label}}, dot.
 - KanbanView: Kanban board. Props: columns [{key, title, color, limit}], cards [{id, title, columnKey, meta}].
 - KnowledgeWiki: Obsidian-style local-first wiki workspace. Renders a premium markdown note tree, backlinks explorer, and interactive force-directed relationship graph. Props: collection (must pass the name of the memory tree collection, e.g. "app_orders_memory_nodes").
-- ChartBlock: High-end interactive data visualization chart. Props: collection, chartType ('bar' | 'line' | 'pie'), xField (grouping field), yField (numeric metric field), title (string).
+- ChartBlock: High-end interactive data visualization chart. Props: collection, chartType ('bar' | 'line' | 'pie' | 'donut'), xField (grouping field), yField (numeric metric field), title (string).
+- Statistic: KPI stats card. Props: title (string), value (number|string), trend ('up'|'down'|'none'), trendValue (string|number), gradientType ('cyan'|'green'|'orange'|'blue'|'none').
+- Progress: Visual completion rate. Props: percent (number), type ('line'|'circle'), status ('success'|'exception'|'normal'|'active').
+- Timeline: Chronological trail. Props: items [{label, children, color}].
+- Steps: Multi-step process steps. Props: current (number), direction ('horizontal'|'vertical'), items [{title, subTitle, description}].
+- Calendar: Calendar event schedule. Props: collection, dateField, titleField.
+- Rate: Star rating component. Props: value, count, allowHalf (boolean), disabled (boolean).
 - Divider: Horizontal separator layout line. Props: type ('horizontal' | 'vertical'), dashed (boolean), orientation ('left' | 'right' | 'center').
 - ColorPicker: Input field for color hex codes. Props: allowClear (boolean). In readPretty mode, displays a colored swatch pill with hex label.
 - TimePicker: Selector for HH:mm:ss times. Props: format (string), use12Hours (boolean).
@@ -85,7 +108,12 @@ Available block types:
 - Kanban: Kanban board with draggable cards.
 - KnowledgeWiki: Obsidian-style wiki workspace with dynamic markdown linking, backlinks, and node relationship graphs. Needs "collection" prop mapping.
 - ChartBlock: Graphical report dashboard showing aggregations. Needs collection, chartType, xField, yField.
-
+- Statistic: Metric display card with trends and gradients.
+- Progress: Linear or circular completion progress.
+- Timeline: Chronological event checklist or timeline.
+- Steps: Horizontal or vertical process steps indicator.
+- Calendar: Dynamic scheduler drawing events from database collections.
+- Rate: Star rating input wrapper.
 
 Each block should be self-contained with a proper x-component, x-decorator, and child properties.
 Always include unique x-uid values on every schema node.

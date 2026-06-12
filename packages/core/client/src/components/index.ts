@@ -79,6 +79,18 @@ export { KanbanView } from './block/KanbanView';
 export type { KanbanViewProps, KanbanCard, KanbanColumn } from './block/KanbanView';
 export { KnowledgeWiki } from './block/KnowledgeWiki';
 export type { KnowledgeWikiProps, WikiNode } from './block/KnowledgeWiki';
+export { Statistic } from './display/Statistic';
+export type { StatisticProps } from './display/Statistic';
+export { Progress } from './display/Progress';
+export type { ProgressProps } from './display/Progress';
+export { Timeline } from './display/Timeline';
+export type { TimelineProps, TimelineItem } from './display/Timeline';
+export { Steps } from './display/Steps';
+export type { StepsProps, StepItem } from './display/Steps';
+export { Calendar } from './display/Calendar';
+export type { CalendarProps } from './display/Calendar';
+export { Rate } from './input/Rate';
+export type { RateProps } from './input/Rate';
 
 // Component registration
 import { registerComponent } from '@formai/schema-engine';
@@ -114,6 +126,12 @@ import { Divider } from './layout/Divider';
 import { ChartBlock } from './block/ChartBlock';
 import { ColorPicker } from './input/ColorPicker';
 import { TimePicker } from './input/TimePicker';
+import { Statistic } from './display/Statistic';
+import { Progress } from './display/Progress';
+import { Timeline } from './display/Timeline';
+import { Steps } from './display/Steps';
+import { Calendar } from './display/Calendar';
+import { Rate } from './input/Rate';
 
 
 export function registerCoreComponents(): void {
@@ -374,5 +392,47 @@ export function registerCoreComponents(): void {
     title: 'KnowledgeWiki',
     description: 'Obsidian-style wiki workspace with dynamic Markdown linking and an interactive force-directed relationship graph.',
     aiDescription: 'Obsidian-style local-first wiki workspace. Takes collection (string) prop representing the memory_nodes collection. Automatically lists linked entities and displays backlinks and a dynamic relationship graph.',
+  });
+  registerComponent('Statistic', {
+    component: Statistic as React.ComponentType,
+    category: 'display',
+    title: 'Statistic',
+    description: 'Stat metric showing card and value trend indicator',
+    aiDescription: 'A premium KPI statistics card. Pass title, value, precision, prefix, suffix, trend ("up" | "down" | "none"), trendValue, and gradientType ("cyan" | "green" | "orange" | "blue" | "none").',
+  });
+  registerComponent('Progress', {
+    component: Progress as React.ComponentType,
+    category: 'display',
+    title: 'Progress',
+    description: 'Visual indicator of task completion rates',
+    aiDescription: 'A progress indicator. Pass percent (number), type ("line" | "circle"), and status ("success" | "exception" | "normal" | "active").',
+  });
+  registerComponent('Timeline', {
+    component: Timeline as React.ComponentType,
+    category: 'display',
+    title: 'Timeline',
+    description: 'A list of items aligned chronologically',
+    aiDescription: 'Chronological timeline display. Pass items array (label, children, color).',
+  });
+  registerComponent('Steps', {
+    component: Steps as React.ComponentType,
+    category: 'display',
+    title: 'Steps',
+    description: 'Progress bar highlighting multi-step wizards',
+    aiDescription: 'Steps workflow progress wizard. Pass current (number), direction ("horizontal" | "vertical"), size ("default" | "small"), and items array (title, subTitle, description).',
+  });
+  registerComponent('Calendar', {
+    component: Calendar as React.ComponentType,
+    category: 'display',
+    title: 'Calendar',
+    description: 'A calendar view loading records from a collection',
+    aiDescription: 'Calendar scheduler. Pass collection, dateField (date to match), and titleField (title of event).',
+  });
+  registerComponent('Rate', {
+    component: Rate as React.ComponentType,
+    category: 'input',
+    title: 'Rate',
+    description: 'Star rating selector',
+    aiDescription: 'Star-rating input. Pass value, count, allowHalf (boolean), and disabled (boolean).',
   });
 }

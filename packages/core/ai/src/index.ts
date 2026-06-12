@@ -33,6 +33,9 @@ export { AgentRuntime } from './agent/runtime';
 export type { ExecutionContext } from './agent/runtime';
 export { ToolRegistry } from './agent/tool-registry';
 export type { ToolHandler } from './agent/tool-registry';
+export { MultiAgentCoordinator } from './agent/coordinator';
+export type { CoordinatorContext } from './agent/coordinator';
+export { CritiqueEvaluator } from './agent/evaluator';
 
 // Memory
 export { VectorMemory } from './memory/vector-memory';

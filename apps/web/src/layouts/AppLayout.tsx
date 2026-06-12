@@ -18,8 +18,10 @@ import {
   EyeOutlined,
   EditOutlined,
   SettingOutlined,
+  SunOutlined,
+  MoonOutlined,
 } from '@ant-design/icons';
-import { useDesignMode } from '@formai/client';
+import { useDesignMode, useTheme } from '@formai/client';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -280,6 +282,7 @@ export function AppLayout({ currentUser, onSignOut, children }: AppLayoutProps) 
   const { appId } = useParams<{ appId: string }>();
 
   const { mode, setMode, toggleMode } = useDesignMode();
+  const { isDark, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(() => window.innerWidth < 768);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
@@ -434,6 +437,16 @@ export function AppLayout({ currentUser, onSignOut, children }: AppLayoutProps) 
               onClick={() => setAiPanelOpen((v) => !v)}
             >
               {!isMobile && 'AI Assistant'}
+            </Button>
+          </Tooltip>
+
+          <Tooltip title={isDark ? 'Light Theme' : 'Dark Theme'}>
+            <Button
+              size="small"
+              icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+              onClick={toggleTheme}
+            >
+              {!isMobile && (isDark ? 'Light' : 'Dark')}
             </Button>
           </Tooltip>
 

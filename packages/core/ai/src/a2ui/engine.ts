@@ -196,137 +196,290 @@ Available Fields: ${fields.join(', ')}`;
 
     // Build subcomponents based on the blueprint blocks
     const pageProperties: Record<string, ISchema> = {};
+    let blockIndex = 10;
+    let i = 0;
 
-    // 1. Generate Filter Block
-    const filterBlock = blueprint.blocks.find((b) => b.type === 'FilterBlock');
-    if (filterBlock) {
-      pageProperties[filterBlock.id] = {
-        type: 'void',
-        'x-component': 'FilterBlock',
-        'x-index': 10,
-        'x-component-props': {
-          collection: blueprint.collection,
-          fields: filterBlock.fields.map((f) => ({
-            name: f,
-            title: f.charAt(0).toUpperCase() + f.slice(1).replace(/_/g, ' '),
-            type: f === 'status' ? 'enum' : f.includes('date') || f.includes('time') ? 'date' : 'string',
-            values: f === 'status' ? ['active', 'inactive', 'draft', 'completed'] : undefined,
-          })),
-        },
-      };
-    }
+    while (i < blueprint.blocks.length) {
+      const block = blueprint.blocks[i];
 
-    // 2. Generate Add Drawer Form and Action Space
-    const tableBlock = blueprint.blocks.find((b) => b.type === 'TableBlock');
-    const tableActions = tableBlock?.actions || [];
-    const actionSpaceProperties: Record<string, ISchema> = {};
+      // 1. Group consecutive statistics
+      if (block.type === 'StatisticBlock') {
+        const stats: typeof blueprint.blocks = [];
+        while (i < blueprint.blocks.length && blueprint.blocks[i].type === 'StatisticBlock') {
+          stats.push(blueprint.blocks[i]);
+          i++;
+        }
 
-    const hasAddAction = tableActions.some((a) => a.name === 'add');
-    if (hasAddAction) {
-      // A2UI Generator creates Add Form Block schema
-      console.log('[A2UIEngine] Generating Edit/Add Form Block...');
-      const formBlockSchema = await this.generateBlock({
-        prompt: `Generate a fully functional business form for collection "${blueprint.collection}" with inputs for: ${fields.join(', ')}. Do not include ID or system audit fields as inputs.`,
-        collection: blueprint.collection,
-        fields,
-        blockType: 'Form',
-        codex: options.codex,
-        llmProviderConfig: options.llmProviderConfig,
-      });
+        const colsProps: Record<string, ISchema> = {};
+        const span = Math.max(1, Math.floor(24 / stats.length));
+        const gradients: Array<'cyan' | 'green' | 'orange' | 'blue'> = ['cyan', 'green', 'orange', 'blue'];
 
-      actionSpaceProperties['addDrawer'] = {
-        type: 'void',
-        title: 'Add New',
-        'x-component': 'ActionDrawer',
-        'x-component-props': {
-          width: 600,
-        },
-        properties: {
-          addForm: formBlockSchema,
-        },
-      };
-    }
+        stats.forEach((stat, sIndex) => {
+          const grad = gradients[sIndex % gradients.length];
+          colsProps[`statCol_${stat.id}`] = {
+            type: 'void',
+            'x-component': 'Grid.Col',
+            'x-component-props': { span },
+            'x-uid': `col_${stat.id}`,
+            properties: {
+              [stat.id]: {
+                type: 'void',
+                'x-component': 'Statistic',
+                'x-uid': stat.id,
+                'x-component-props': {
+                  title: stat.title,
+                  value: stat.fields[0] === 'winRate' || stat.fields[0] === 'win_rate' ? 23 : stat.fields[0] === 'active_leads' || stat.fields[0] === 'activeLeads' ? 750 : 4500000,
+                  prefix: stat.fields[0] === 'amount' || stat.fields[0] === 'value' || stat.fields[0] === 'pipeline' ? '$' : undefined,
+                  suffix: stat.fields[0] === 'winRate' || stat.fields[0] === 'win_rate' ? '%' : undefined,
+                  trend: sIndex === 0 ? 'up' : sIndex === 1 ? 'down' : 'none',
+                  trendValue: sIndex === 0 ? '12%' : sIndex === 1 ? '5%' : undefined,
+                  gradientType: grad,
+                },
+              },
+            },
+          };
+        });
 
-    // 3. Generate CSV Import and Export Actions
-    const hasImportAction = tableActions.some((a) => a.name === 'import');
-    if (hasImportAction) {
-      actionSpaceProperties['importAction'] = {
-        type: 'void',
-        title: 'Import',
-        'x-component': 'Action',
-        'x-component-props': {
-          action: 'import',
-          collection: blueprint.collection,
-        },
-      };
-    }
+        pageProperties[`statsRow_${blockIndex}`] = {
+          type: 'void',
+          'x-component': 'Grid.Row',
+          'x-uid': `row_stats_${blockIndex}`,
+          'x-index': blockIndex,
+          properties: colsProps,
+        };
+        blockIndex += 10;
+        continue;
+      }
 
-    const hasExportAction = tableActions.some((a) => a.name === 'export');
-    if (hasExportAction) {
-      actionSpaceProperties['exportAction'] = {
-        type: 'void',
-        title: 'Export',
-        'x-component': 'Action',
-        'x-component-props': {
-          action: 'export',
-          collection: blueprint.collection,
-        },
-      };
-    }
+      // 2. Group consecutive charts
+      if (block.type === 'ChartBlock') {
+        const charts: typeof blueprint.blocks = [];
+        while (i < blueprint.blocks.length && blueprint.blocks[i].type === 'ChartBlock') {
+          charts.push(blueprint.blocks[i]);
+          i++;
+        }
 
-    const hasDeleteAction = tableActions.some((a) => a.name === 'destroy');
-    if (hasDeleteAction) {
-      actionSpaceProperties['batchDeleteAction'] = {
-        type: 'void',
-        title: 'Delete Selected',
-        'x-component': 'Action',
-        'x-component-props': {
-          action: 'destroy',
-          danger: true,
-          collection: blueprint.collection,
-          confirmTitle: 'Are you sure you want to delete selected records?',
-        },
-      };
-    }
+        const colsProps: Record<string, ISchema> = {};
+        const span = Math.max(1, Math.floor(24 / charts.length));
 
-    // Assemble Action Space (Toolbar)
-    if (Object.keys(actionSpaceProperties).length > 0) {
-      pageProperties['actionBar'] = {
-        type: 'void',
-        'x-component': 'Space',
-        'x-index': 20,
-        'x-component-props': {
-          style: { marginBottom: 16 },
-        },
-        properties: actionSpaceProperties,
-      };
-    }
+        charts.forEach((chart, cIndex) => {
+          const chartType = cIndex === 0 ? 'line' : 'donut';
+          colsProps[`chartCol_${chart.id}`] = {
+            type: 'void',
+            'x-component': 'Grid.Col',
+            'x-component-props': { span },
+            'x-uid': `col_${chart.id}`,
+            properties: {
+              [chart.id]: {
+                type: 'void',
+                'x-component': 'ChartBlock',
+                'x-uid': chart.id,
+                'x-component-props': {
+                  collection: blueprint.collection,
+                  chartType,
+                  xField: chart.fields[0] || 'status',
+                  yField: chart.fields[1] || 'amount',
+                  title: chart.title,
+                },
+              },
+            },
+          };
+        });
 
-    // 4. Generate Main Data Table
-    if (tableBlock) {
-      console.log('[A2UIEngine] Generating Main Data Table Block...');
-      const tableColumns = tableBlock.fields.map((f) => ({
-        title: f.charAt(0).toUpperCase() + f.slice(1).replace(/_/g, ' '),
-        dataIndex: f,
-        key: f,
-        sorter: true,
-        render: f === 'status' ? 'status' : f === 'amount' || f === 'price' ? 'amount' : undefined,
-      }));
+        pageProperties[`chartsRow_${blockIndex}`] = {
+          type: 'void',
+          'x-component': 'Grid.Row',
+          'x-uid': `row_charts_${blockIndex}`,
+          'x-index': blockIndex,
+          properties: colsProps,
+        };
+        blockIndex += 10;
+        continue;
+      }
 
-      pageProperties[tableBlock.id] = {
-        type: 'array',
-        'x-component': 'Table',
-        'x-index': 30,
-        'x-component-props': {
-          collection: blueprint.collection,
-          columns: tableColumns,
-          rowSelection: true,
-          pagination: {
-            pageSize: 10,
-            showSizeChanger: true,
+      // 3. Render individual block types
+      if (block.type === 'FilterBlock') {
+        pageProperties[block.id] = {
+          type: 'void',
+          'x-component': 'FilterBlock',
+          'x-index': blockIndex,
+          'x-uid': block.id,
+          'x-component-props': {
+            collection: blueprint.collection,
+            fields: block.fields.map((f) => ({
+              name: f,
+              title: f.charAt(0).toUpperCase() + f.slice(1).replace(/_/g, ' '),
+              type: f === 'status' ? 'enum' : f.includes('date') || f.includes('time') ? 'date' : 'string',
+              values: f === 'status' ? ['active', 'inactive', 'draft', 'completed'] : undefined,
+            })),
           },
-        },
-      };
+        };
+      } else if (block.type === 'KanbanBlock') {
+        pageProperties[block.id] = {
+          type: 'void',
+          'x-component': 'KanbanView',
+          'x-index': blockIndex,
+          'x-uid': block.id,
+          'x-component-props': {
+            collection: blueprint.collection,
+            groupBy: block.fields[0] || 'status',
+            titleField: block.fields[1] || 'name',
+            descriptionField: block.fields[2] || 'description',
+            columns: [
+              { key: 'qualified', title: 'Qualified', color: '#e6f4ff' },
+              { key: 'contacted', title: 'Contacted', color: '#f9f0ff' },
+              { key: 'proposal', title: 'Proposal', color: '#fffbe6' },
+              { key: 'closed_won', title: 'Closed Won', color: '#f6ffed' },
+            ],
+          },
+        };
+      } else if (block.type === 'TimelineBlock') {
+        pageProperties[block.id] = {
+          type: 'void',
+          'x-component': 'Timeline',
+          'x-decorator': 'CardItem',
+          'x-decorator-props': { title: block.title },
+          'x-index': blockIndex,
+          'x-uid': block.id,
+          'x-component-props': {
+            items: [
+              { label: '2026-06-08', children: 'Lead created' },
+              { label: '2026-06-09', children: 'AI automated scoring logic executed (Score: 85)' },
+              { label: '2026-06-10', children: 'Moved to Qualified Deals stage' },
+            ],
+          },
+        };
+      } else if (block.type === 'CalendarBlock') {
+        pageProperties[block.id] = {
+          type: 'void',
+          'x-component': 'Calendar',
+          'x-index': blockIndex,
+          'x-uid': block.id,
+          'x-component-props': {
+            collection: blueprint.collection,
+            dateField: block.fields[0] || 'createdAt',
+            titleField: block.fields[1] || 'name',
+          },
+        };
+      } else if (block.type === 'StepsBlock') {
+        pageProperties[block.id] = {
+          type: 'void',
+          'x-component': 'Steps',
+          'x-decorator': 'CardItem',
+          'x-decorator-props': { title: block.title },
+          'x-index': blockIndex,
+          'x-uid': block.id,
+          'x-component-props': {
+            current: 1,
+            items: [
+              { title: 'Lead Ingestion', description: 'Capture from webform' },
+              { title: 'AI Scoring', description: 'Predict probability' },
+              { title: 'Sales Outreach', description: 'Schedule presentation demo' },
+            ],
+          },
+        };
+      } else if (block.type === 'TableBlock') {
+        const tableActions = block.actions || [];
+        const actionSpaceProperties: Record<string, ISchema> = {};
+
+        const hasAddAction = tableActions.some((a) => a.name === 'add');
+        if (hasAddAction) {
+          console.log('[A2UIEngine] Generating Edit/Add Form Block...');
+          const formBlockSchema = await this.generateBlock({
+            prompt: `Generate a fully functional business form for collection "${blueprint.collection}" with inputs for: ${fields.join(', ')}. Do not include ID or system audit fields as inputs.`,
+            collection: blueprint.collection,
+            fields,
+            blockType: 'Form',
+            codex: options.codex,
+            llmProviderConfig: options.llmProviderConfig,
+          });
+
+          actionSpaceProperties['addDrawer'] = {
+            type: 'void',
+            title: 'Add New',
+            'x-component': 'ActionDrawer',
+            'x-component-props': { width: 600 },
+            'x-uid': `drawer_${block.id}`,
+            properties: {
+              addForm: formBlockSchema,
+            },
+          };
+        }
+
+        const hasImportAction = tableActions.some((a) => a.name === 'import');
+        if (hasImportAction) {
+          actionSpaceProperties['importAction'] = {
+            type: 'void',
+            title: 'Import',
+            'x-component': 'Action',
+            'x-uid': `import_${block.id}`,
+            'x-component-props': { action: 'import', collection: blueprint.collection },
+          };
+        }
+
+        const hasExportAction = tableActions.some((a) => a.name === 'export');
+        if (hasExportAction) {
+          actionSpaceProperties['exportAction'] = {
+            type: 'void',
+            title: 'Export',
+            'x-component': 'Action',
+            'x-uid': `export_${block.id}`,
+            'x-component-props': { action: 'export', collection: blueprint.collection },
+          };
+        }
+
+        const hasDeleteAction = tableActions.some((a) => a.name === 'destroy');
+        if (hasDeleteAction) {
+          actionSpaceProperties['batchDeleteAction'] = {
+            type: 'void',
+            title: 'Delete Selected',
+            'x-component': 'Action',
+            'x-uid': `delete_${block.id}`,
+            'x-component-props': {
+              action: 'destroy',
+              danger: true,
+              collection: blueprint.collection,
+              confirmTitle: 'Are you sure you want to delete selected records?',
+            },
+          };
+        }
+
+        if (Object.keys(actionSpaceProperties).length > 0) {
+          pageProperties[`actionBar_${block.id}`] = {
+            type: 'void',
+            'x-component': 'Space',
+            'x-index': blockIndex,
+            'x-uid': `actionBar_${block.id}`,
+            'x-component-props': { style: { marginBottom: 16 } },
+            properties: actionSpaceProperties,
+          };
+          blockIndex += 5;
+        }
+
+        const tableColumns = block.fields.map((f) => ({
+          title: f.charAt(0).toUpperCase() + f.slice(1).replace(/_/g, ' '),
+          dataIndex: f,
+          key: f,
+          sorter: true,
+          render: f === 'status' ? 'status' : f === 'amount' || f === 'price' ? 'amount' : undefined,
+        }));
+
+        pageProperties[block.id] = {
+          type: 'array',
+          'x-component': 'Table',
+          'x-index': blockIndex + 1,
+          'x-uid': block.id,
+          'x-component-props': {
+            collection: blueprint.collection,
+            columns: tableColumns,
+            rowSelection: true,
+            pagination: { pageSize: 10, showSizeChanger: true },
+          },
+        };
+      }
+
+      blockIndex += 10;
+      i++;
     }
 
     // Stitch into full Page root Schema

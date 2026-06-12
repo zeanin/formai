@@ -12,6 +12,8 @@ import {
   createAPIClient,
   APIClientProvider,
   DesignModeProvider,
+  ThemeProvider,
+  useTheme,
 } from '@formai/client';
 import {
   ConfigProvider,
@@ -798,6 +800,34 @@ function App() {
     message.info('Signed out');
   }, []);
 
+  return (
+    <ThemeProvider>
+      <AppContent
+        authChecking={authChecking}
+        currentUser={currentUser}
+        currentRole={currentRole}
+        handleLogin={handleLogin}
+        handleSignOut={handleSignOut}
+      />
+    </ThemeProvider>
+  );
+}
+
+function AppContent({
+  authChecking,
+  currentUser,
+  currentRole,
+  handleLogin,
+  handleSignOut,
+}: {
+  authChecking: boolean;
+  currentUser: any;
+  currentRole: string | null;
+  handleLogin: (user: any, role: string) => void;
+  handleSignOut: () => void;
+}) {
+  const { isDark } = useTheme();
+
   if (authChecking) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -807,7 +837,12 @@ function App() {
   }
 
   return (
-    <ConfigProvider theme={{ token: { colorPrimary: '#1677ff', borderRadius: 6 } }}>
+    <ConfigProvider
+      theme={{
+        algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        token: { colorPrimary: '#1677ff', borderRadius: 6 },
+      }}
+    >
       <APIClientProvider client={apiClient}>
         <SchemaComponentProvider>
           <DesignModeProvider>

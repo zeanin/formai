@@ -7,6 +7,7 @@ export * from './designer';
 // Providers
 export { SchemaComponentProvider } from './providers/SchemaComponentProvider';
 export type { SchemaComponentProviderProps } from './providers/SchemaComponentProvider';
+export { ThemeProvider, useTheme } from './providers/ThemeContext';
 export {
   APIClientProvider,
   APIClientContext,

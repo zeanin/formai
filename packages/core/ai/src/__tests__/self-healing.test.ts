@@ -95,9 +95,9 @@ describe('Codex Self-Healing & Blueprint Compilation', () => {
     expect(pageProperties.contractsFilter['x-component-props']?.collection).toBe('contracts');
 
     // Verify ActionBar Space is placed in middle
-    expect(pageProperties.actionBar).toBeDefined();
-    expect(pageProperties.actionBar['x-component']).toBe('Space');
-    const actions = pageProperties.actionBar.properties;
+    expect(pageProperties.actionBar_contractsTable).toBeDefined();
+    expect(pageProperties.actionBar_contractsTable['x-component']).toBe('Space');
+    const actions = pageProperties.actionBar_contractsTable.properties;
     expect(actions.importAction).toBeDefined();
     expect(actions.importAction['x-component-props']?.action).toBe('import');
     expect(actions.exportAction).toBeDefined();
